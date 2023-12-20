@@ -1,168 +1,109 @@
--- phpMyAdmin SQL Dump
--- version 5.0.2
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Tempo de geração: 20-Set-2020 às 04:20
--- Versão do servidor: 10.4.13-MariaDB
--- versão do PHP: 7.4.8
+drop database if exists db_empregados;
+create database db_empregados;
+use db_empregados;
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+CREATE TABLE cidade (
+cod_cidade varchar(5) PRIMARY KEY,
+nome Varchar(50) NOT NULL,
+estado char(2) NOT NULL
+);
+
+CREATE TABLE departamento (
+cod_depto varchar(5) PRIMARY KEY,
+nome Varchar(50) NOT NULL,
+cod_cidade Varchar(5) NOT NULL,
+cod_gerente varchar(5),
+data_inicio_gerencia date,
+constraint fk_depto_cidade  FOREIGN KEY(cod_cidade) REFERENCES cidade(cod_cidade)
+);
+
+CREATE TABLE projeto(
+cod_proj varchar(5) PRIMARY KEY,
+nome Varchar(50) NOT NULL,
+data_ini date,
+data_fim date,
+cod_depto varchar(5),
+constraint fk_Proj_depto  FOREIGN KEY(cod_depto) REFERENCES departamento(cod_depto) 
+);
+
+CREATE TABLE empregado (
+cod_emp varchar(5) PRIMARY KEY,
+cod_depto varchar(5) NOT NULL,
+nome Varchar(30) NOT NULL,
+segundo_nome varchar(20),
+sobrenome Varchar(20) NOT NULL,
+salario float NOT NULL,
+datanasc date NOT NULL,
+telefone  Varchar(20) NOT NULL,
+cod_empregado_superior varchar(5),
+CONSTRAINT fk_depto FOREIGN KEY ( cod_depto ) REFERENCES departamento (cod_depto));
+
+alter table departamento add constraint fk_depto_empregado  FOREIGN KEY(cod_gerente) REFERENCES empregado(cod_emp);
+
+CREATE TABLE endereco_empregado (
+cod_emp varchar(5) PRIMARY KEY,
+logradouro Varchar(50) NOT NULL,
+bairro Varchar(50) ,
+numero Varchar(50) NOT NULL,
+cod_cidade Varchar(5) NOT NULL,
+cep  Varchar(8) NOT NULL,
+constraint fk_end_empregado  FOREIGN KEY(cod_emp) REFERENCES empregado(cod_emp),
+constraint fk_end_cidade  FOREIGN KEY(cod_cidade) REFERENCES cidade(cod_cidade));
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+CREATE TABLE emp_proj (
+cod_emp varchar(5),
+cod_proj varchar(5),
+papel_emp Varchar(50),
+CONSTRAINT PK_projemp PRIMARY KEY (cod_proj, cod_emp),
+constraint fk_projemp  FOREIGN KEY(cod_proj) REFERENCES projeto(cod_proj),
+constraint fk_projemp2 FOREIGN KEY(cod_emp) REFERENCES empregado(cod_emp) 
+);
 
---
--- Banco de dados: `academico`
---
-CREATE DATABASE IF NOT EXISTS `academicog` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `academicog`;
 
--- --------------------------------------------------------
+insert into cidade values ('C01', 'São Paulo','SP');
+insert into cidade values ('C02', 'São José dos Campos','SP');
+insert into cidade values ('C03', 'Rio de Janeiro','RJ');
+insert into cidade values ('C04', 'Campinas','SP');
+insert into cidade values ('C05', 'Vitória','ES');
+insert into cidade values ('C06', 'Belo Horizonte','MG');
+insert into cidade values ('C07', 'Uberlândia','MG');
+insert into cidade values ('C08', 'São Carlos','SP');
+insert into cidade values ('C09', 'Santo André','SP');
 
---
--- Estrutura da tabela `cursos`
---
 
-CREATE TABLE `cursos` (
-  `idcurso` int(11) NOT NULL DEFAULT 0,
-  `nome` varchar(30) NOT NULL,
-  `descricao` text DEFAULT NULL,
-  `carga` int(10) UNSIGNED DEFAULT NULL,
-  `ano` year(4) DEFAULT 2016
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+insert into departamento values ('RH', 'Recursos Humanos','C05',null,null);
+insert into departamento values ('TI', 'Tecnologia','C04',null,null);
+insert into departamento values ('RP', 'Relações Públicas','C01',null,null);
 
---
--- Extraindo dados da tabela `cursos`
---
 
-INSERT INTO `cursos` (`idcurso`, `nome`, `descricao`, `carga`, `ano`) VALUES
-(1, 'Algoritmos', 'Lógica de Programação', 20, 2014),
-(2, 'PHP', 'Curso de PHP para iniciantes', 40, 2015),
-(3, 'Java', 'Introdução à Linguagem Java', 40, 2015),
-(4, 'MySQL', 'Bancos de Dados MySQL', 30, 2016),
-(5, 'C++', 'Curso de C++ com Orientação a Objetos', 40, 2017),
-(6, 'Android', 'Curso de Desenvolvimento de Aplicativos para Android', 60, 2018),
-(7, 'JavaScript', 'Curso de JavaScript', 35, 2017);
+insert into projeto values ('P1','Projeto 1','2020-01-01','2020-03-01','TI');
+insert into projeto values ('P2','Projeto Alfa','2019-12-31','2020-02-28','TI');
+insert into projeto values ('P4','Projeto Beta','2019-04-01','2019-05-01','RP');
+insert into projeto values ('P5','Projeto Gama','2019-04-01','2019-05-01','RP');
+insert into projeto values ('P6','Projeto X','2020-04-01',null,'RP');
+insert into projeto values ('P3','Projeto Final','2019-04-01','2019-05-01','TI');
+insert into projeto values ('P7','Projeto da disciplina',Null, Null,'TI');
 
--- --------------------------------------------------------
 
---
--- Estrutura da tabela `estudantes`
---
+insert into empregado values ('E1','TI','João',null,'Silva',  1000.00, '1980-03-03', '11 2345 6789',null);
+insert into empregado values ('E2','TI','João','Robson','Sousa',  2000.00, '1981-04-03',  '11 98765 4321','E1');
+insert into empregado values ('E3','RP','Maria','Alice','Silva', 1500.00, '1965-05-10', '21 91234 5678',null);
+insert into empregado values ('E4','RH','João','Roberto','Silva',  4000.00, '1970-12-03', '21 97531 2468',null);
 
-CREATE TABLE `estudantes` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(30) NOT NULL,
-  `nascimento` date DEFAULT NULL,
-  `sexo` enum('M','F') DEFAULT NULL,
-  `nacionalidade` varchar(20) DEFAULT 'Brasil',
-  `cursopreferido` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Extraindo dados da tabela `estudantes`
---
+insert into endereco_empregado values ('E1', 'Rua dos Passaros',null,'4','C03','12345789');
+insert into endereco_empregado values ('E2', 'Av da Saudade','Jd Lucia','567','C09','13579246');
+insert into endereco_empregado values ('E3', 'Av Brasil','Jd America','8','C07','24567890');
+insert into endereco_empregado values ('E4', 'Av Brasil',null,'40','C07','23235678');
 
-INSERT INTO `estudantes` (`id`, `nome`, `nascimento`, `sexo`, `nacionalidade`, `cursopreferido`) VALUES
-(1, 'Daniel Gabriel', '1984-01-02', 'M', 'Brasil', 7),
-(2, 'Talita Morais', '1999-12-30', 'F', 'Portugal', 7),
-(3, 'Emerson Nascimento', '1920-12-30', 'M', 'Moçambique', 1),
-(4, 'Letícia Damasceno', '1930-11-02', 'M', 'Irlanda', 2),
-(5, 'Leila Couto ', '1975-04-22', 'F', 'Brasil', 3),
-(6, 'Lucas Neves', '1999-12-03', 'F', 'Brasil', 4),
-(7, 'Janaína Martins', '1987-11-12', 'F', 'EUA', 1),
-(8, 'João Rosa', '2010-08-01', 'M', 'Brasil', 1),
-(9, 'Pedro Telles', '1999-01-23', 'M', 'Portugal', 1),
-(10, 'Rita Araujo', '1975-12-10', 'M', 'EUA', 1);
+update departamento set cod_gerente = 'E1', data_inicio_gerencia = '2023-03-01' where  cod_depto = 'TI';
+update departamento set cod_gerente = 'E3', data_inicio_gerencia = '2023-08-01' where  cod_depto = 'RP';
+update departamento set cod_gerente = 'E4', data_inicio_gerencia = '2023-07-01' where  cod_depto = 'RH';
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `estudante_assiste_curso`
---
-
-CREATE TABLE `estudante_assiste_curso` (
-  `id` int(11) NOT NULL,
-  `data` date DEFAULT NULL,
-  `idestudante` int(11) DEFAULT NULL,
-  `idcurso` int(11) DEFAULT NULL,
-  `Nota` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Extraindo dados da tabela `estudante_assiste_curso`
---
-
-INSERT INTO `estudante_assiste_curso` (`id`, `data`, `idestudante`, `idcurso`, `Nota`) VALUES
-(1, '2020-05-18', 1, 2, 0),
-(2, '2020-05-18', 1, 5, 0);
-
---
--- Índices para tabelas despejadas
---
-
---
--- Índices para tabela `cursos`
---
-ALTER TABLE `cursos`
-  ADD PRIMARY KEY (`idcurso`),
-  ADD UNIQUE KEY `nome` (`nome`);
-
---
--- Índices para tabela `estudantes`
---
-ALTER TABLE `estudantes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `pk_c` (`cursopreferido`);
-
---
--- Índices para tabela `estudante_assiste_curso`
---
-ALTER TABLE `estudante_assiste_curso`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idestudante` (`idestudante`),
-  ADD KEY `idcurso` (`idcurso`);
-
---
--- AUTO_INCREMENT de tabelas despejadas
---
-
---
--- AUTO_INCREMENT de tabela `estudantes`
---
-ALTER TABLE `estudantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
-
---
--- AUTO_INCREMENT de tabela `estudante_assiste_curso`
---
-ALTER TABLE `estudante_assiste_curso`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- Restrições para despejos de tabelas
---
-
---
--- Limitadores para a tabela `estudantes`
---
-ALTER TABLE `estudantes`
-  ADD CONSTRAINT `pk_c` FOREIGN KEY (`cursopreferido`) REFERENCES `cursos` (`idcurso`);
-
---
--- Limitadores para a tabela `estudante_assiste_curso`
---
-ALTER TABLE `estudante_assiste_curso`
-  ADD CONSTRAINT `estudante_assiste_curso_ibfk_1` FOREIGN KEY (`idestudante`) REFERENCES `estudantes` (`id`),
-  ADD CONSTRAINT `estudante_assiste_curso_ibfk_2` FOREIGN KEY (`idcurso`) REFERENCES `cursos` (`idcurso`);
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+insert into emp_proj values ('E1','P1','Desenvolvedor');
+insert into emp_proj values ('E2','P1','Desenvolvedor');
+insert into emp_proj values ('E1','P4','Analista');
+insert into emp_proj values ('E4','P6','Observador');
+insert into emp_proj values ('E4','P5','Controlador de Processos');
+insert into emp_proj values ('E1','P7','UX Design');
