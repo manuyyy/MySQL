@@ -1,0 +1,71 @@
+drop database db_projeto3;
+create database db_projeto3;
+use db_projeto3;
+
+CREATE TABLE departamento (
+cod_depto varchar(5) PRIMARY KEY,
+nome Varchar(50) NOT NULL
+);
+
+CREATE TABLE empregado (
+cod_emp varchar(5) PRIMARY KEY,
+cod_depto varchar(5) NOT NULL,
+nome Varchar(30) NOT NULL,
+segundo_nome varchar(20),
+sobrenome Varchar(20) NOT NULL,
+salario float NOT NULL,
+datanasc date NOT NULL,
+logradouro Varchar(50) NOT NULL,
+bairro Varchar(50) NOT NULL,
+numero Varchar(50) NOT NULL,
+cidade Varchar(50) NOT NULL,
+estado Varchar(50) NOT NULL,
+cep  Varchar(8) NOT NULL,
+telefone  Varchar(20) NOT NULL,
+gerente ENUM ('Sim','Não'));
+
+alter TABLE empregado ADD CONSTRAINT fk_depto FOREIGN KEY ( cod_depto ) REFERENCES departamento (cod_depto) ;
+
+CREATE TABLE projeto(
+cod_proj varchar(5) PRIMARY KEY,
+nome Varchar(50) NOT NULL,
+data_ini date,
+data_fim date );
+
+
+CREATE TABLE emp_proj (
+cod_emp varchar(5),
+cod_proj varchar(5),
+papel_emp Varchar(50),
+CONSTRAINT PK_projemp PRIMARY KEY (cod_proj, cod_emp),
+constraint fk_projemp  FOREIGN KEY(cod_proj) REFERENCES projeto(cod_proj),
+constraint fk_projemp2 FOREIGN KEY(cod_emp) REFERENCES empregado(cod_emp) 
+);
+
+insert into departamento values ('RH', 'Recursos Humanos');
+insert into departamento values ('TI', 'Tecnologia');
+insert into departamento (cod_depto,nome) values ('SE','Secretaria');
+
+
+insert into empregado values ('E1','TI','João',null,'Silva',  1000.00, '1980-03-03', 'Rua dos Passaros','','4','Guarulhos','SP','12345789','11 2345 6789','Não');
+insert into empregado values ('E2','TI','João','Robson','Sousa',  2000.00, '1981-04-03', 'Av da Saudade','Jd Lucia','567','São Paulo','SP','13579246', '11 98765 4321','Sim');
+insert into empregado values ('E3','RH','Maria','Alice','Silva', 1500.00, '1965-05-10', 'Av Brasil','Jd America','8','Rio de Janeiro','RJ','24567890','21 91234 5678','Sim');
+insert into empregado values ('E4','RH','João','Roberto','Silva',  4000.00, '1970-12-03', 'Av Brasil','','40','Rio de Janeiro','RJ','23235678','21 97531 2468','Não');
+
+
+
+
+insert into projeto values ('P1','Projeto 1','2020-01-01','2020-03-01');
+insert into projeto values ('P2','Projeto Alfa','2019-12-31','2020-02-28');
+insert into projeto values ('P4','Projeto Beta','2019-04-01','2019-05-01');
+insert into projeto values ('P5','Projeto Gama','2019-04-01','2019-05-01');
+insert into projeto values ('P6','Projeto X','2020-04-01',null);
+insert into projeto (cod_proj, nome, data_ini, data_fim) values ('P3','Projeto Final','2019-04-01','2019-05-01');
+insert into projeto (cod_proj, nome, data_ini, data_fim) values ('P7','Projeto da disciplina',Null, Null);
+
+insert into emp_proj values ('E1','P1','Desenvolvedor');
+insert into emp_proj values ('E2','P1','Desenvolvedor');
+insert into emp_proj values ('E1','P4','Analista');
+insert into emp_proj values ('E4','P6','Analista');
+insert into emp_proj values ('E4','P5','Programador');
+insert into emp_proj values ('E1','P7','UX Design');
